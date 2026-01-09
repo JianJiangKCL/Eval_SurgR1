@@ -70,6 +70,54 @@ docker rm vllm
 
 Then re-run the `docker run` command.
 
+### 1.5 Quick Start with Simple Test
+
+We provide a `simple_test` dataset for quick validation of your setup. This contains 30 sample images from Cholec80 with phase recognition MCQ questions.
+
+#### Step 1: Run Docker Container
+
+Mount the `simple_test` folder to `/data` in the container:
+
+```bash
+docker run -it \
+    --gpus all \
+    --name vllm \
+    -v /path/to/simple_test:/data \
+    -p 8000:8000 \
+    --ipc=host \
+    --shm-size=32g \
+    laparo-vllm:checkpoint-10609-cuda12.2 \
+    /bin/bash
+```
+
+#### Step 2: Run Inference
+
+Inside the container, run:
+
+```bash
+MAX_PIXELS=1003520 \
+CUDA_VISIBLE_DEVICES=0 \
+swift infer \
+    --model /app/model \
+    --system /app/prompts/think_prompt.txt \
+    --attn_impl flash_attn \
+    --infer_backend vllm \
+    --max_batch_size 20 \
+    --val_dataset /data/cholec80_phase_mcq_simple_test.jsonl \
+    --result_path /data/res.jsonl \
+    --vllm_max_model_len 4096 \
+    --max_new_tokens 2048 \
+    --write_batch_size 1000
+```
+
+#### Step 3: Evaluate Results
+
+```bash
+python /app/eval/eval_mcq_acc.py /data/res.jsonl -v
+```
+
+> **Note:** The `simple_test` dataset uses relative image paths (`cholec80/frames/...`), so make sure you mount the `simple_test` folder to `/data` so that the full path `/data/cholec80/frames/...` is accessible inside the container.
+
 ---
 
 ## 2. Data Format Specification
