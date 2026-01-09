@@ -74,7 +74,29 @@ Then re-run the `docker run` command.
 
 We provide a `simple_test` dataset for quick validation of your setup. This contains 30 sample images from Cholec80 with phase recognition MCQ questions.
 
-#### Step 1: Run Docker Container
+#### Step 1: Update Image Paths in JSONL
+
+The JSONL file contains image paths that need to be updated to match your mount location. Use `sed` to replace the root path:
+
+```bash
+# Replace the original root path with your target path
+# Example: Change /data/tos_copy to /data (if mounting simple_test to /data)
+sed -i 's|/data/tos_copy/|/data/|g' simple_test/cholec80_phase_mcq_simple_test.jsonl
+```
+
+The original paths look like:
+```
+/data/tos_copy/cholec80/frames/42/63051.jpg
+```
+
+After replacement (mounting `simple_test` to `/data`):
+```
+/data/cholec80/frames/42/63051.jpg
+```
+
+> **Tip:** Adjust the replacement path based on your Docker mount configuration. The key is to ensure the path in JSONL matches the actual image location inside the container.
+
+#### Step 2: Run Docker Container
 
 Mount the `simple_test` folder to `/data` in the container:
 
@@ -116,7 +138,7 @@ swift infer \
 python /app/eval/eval_mcq_acc.py /data/res.jsonl -v
 ```
 
-> **Note:** The `simple_test` dataset uses relative image paths (`cholec80/frames/...`), so make sure you mount the `simple_test` folder to `/data` so that the full path `/data/cholec80/frames/...` is accessible inside the container.
+> **Note:** Make sure the image paths in the JSONL file match the actual image locations inside the container. If you mount `simple_test` to `/data`, the images will be at `/data/cholec80/frames/...`, so the JSONL paths should be updated accordingly (see Step 1).
 
 ---
 
