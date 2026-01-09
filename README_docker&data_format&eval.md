@@ -76,25 +76,17 @@ We provide a `simple_test` dataset for quick validation of your setup. This cont
 
 #### Step 1: Update Image Paths in JSONL
 
-The JSONL file contains image paths that need to be updated to match your mount location. Use `sed` to replace the root path:
+The JSONL file contains image paths that need to be updated to match your mount location. 
 
-```bash
-# Replace the original root path with your target path
-# Example: Change /data/tos_copy to /data (if mounting simple_test to /data)
-sed -i 's|/data/tos_copy/|/data/|g' simple_test/cholec80_phase_mcq_simple_test.jsonl
-```
-
-The original paths look like:
+Original paths in the JSONL:
 ```
 /data/tos_copy/cholec80/frames/42/63051.jpg
 ```
 
-After replacement (mounting `simple_test` to `/data`):
+You need to replace `/data/tos_copy/` with your actual mount path. For example, if mounting `simple_test` to `/data`:
 ```
 /data/cholec80/frames/42/63051.jpg
 ```
-
-> **Tip:** Adjust the replacement path based on your Docker mount configuration. The key is to ensure the path in JSONL matches the actual image location inside the container.
 
 #### Step 2: Run Docker Container
 
